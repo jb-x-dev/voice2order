@@ -8,12 +8,16 @@ import Home from "./pages/Home";
 import OrderDetail from "./pages/OrderDetail";
 import Demo from "./pages/Demo";
 import Articles from "./pages/Articles";
+import Catalog from "./pages/Catalog";
+import PrintQRCodes from "./pages/PrintQRCodes";
 
 function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path="/demo" component={Demo} />
+      <Route path="/catalog" component={Catalog} />
+      <Route path="/print-qr" component={PrintQRCodes} />
       <Route path="/articles" component={Articles} />
       <Route path={"/order/:id"} component={OrderDetail} />
       <Route path={"/404"} component={NotFound} />
