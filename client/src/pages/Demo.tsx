@@ -8,51 +8,51 @@ import { Link, useLocation } from "wouter";
 const DEMO_ORDERS = [
   {
     id: "demo-1",
-    title: "Bier-Bestellung",
-    text: "Wir brauchen 3 Kisten Augustiner Helles und 2 Kisten Paulaner Weißbier",
+    title: "Premium Bier (jb-x)",
+    text: "Wir brauchen 3 Kisten Augustiner Hell und 2 Kisten Paulaner Weißbier",
     category: "Bier",
   },
   {
     id: "demo-2",
-    title: "Softdrinks",
-    text: "Bestelle 5 Kisten Coca Cola, 3 Kisten Fanta und 4 Kisten Mineralwasser spritzig",
-    category: "Softdrinks",
+    title: "Fass-Bier (jb-x)",
+    text: "Bestelle 2 Fass Hofbräu Festbier und 1 Fass Paulaner Festbier",
+    category: "Fass-Bier",
   },
   {
     id: "demo-3",
-    title: "Säfte",
-    text: "2 Karton Orangensaft und 3 Karton Apfelsaft naturtrüb bitte",
-    category: "Säfte",
+    title: "Softdrinks (jb-x)",
+    text: "5 Kisten Coca Cola, 3 Kisten Fanta und 4 Kisten Mineralwasser spritzig",
+    category: "Softdrinks",
   },
   {
     id: "demo-4",
-    title: "Kaffee & Tee",
-    text: "Ich brauche 2 Kilo Espresso Bohnen Arabica und 5 Pack Kaffee Crema gemahlen",
-    category: "Kaffee & Tee",
+    title: "Weihenstephan (jb-x)",
+    text: "Ich brauche 2 Kisten Weihenstephaner Festbier und 1 Weihenstephaner 30L KEG",
+    category: "Premium",
   },
   {
     id: "demo-5",
-    title: "Wein",
-    text: "1 Karton Grauburgunder trocken und 2 Karton Prosecco Spumante",
-    category: "Wein",
+    title: "Spezialitäten (jb-x)",
+    text: "1 Karton Tannenzäpfle Bier-Gelee und 2 Flaschen Allgäuer Bierlikör",
+    category: "Spezialitäten",
   },
   {
     id: "demo-6",
-    title: "Milchprodukte",
-    text: "Wir benötigen 3 Karton Vollmilch, 2 Karton Hafermilch Barista und 5 Liter Sahne",
-    category: "Milch",
+    title: "Weißbier Mix (jb-x)",
+    text: "Wir benötigen 3 Kisten Erdinger alkoholfrei, 2 Kisten Franziskaner Weißbier und 1 Kiste Paulaner Hefe-Weißbier",
+    category: "Weißbier",
   },
   {
     id: "demo-7",
-    title: "Spirituosen",
-    text: "Bestelle 2 Flaschen Gin London Dry, 1 Flasche Vodka Premium und 3 Flaschen Grappa",
-    category: "Spirituosen",
+    title: "Bayrische Klassiker (jb-x)",
+    text: "Bestelle 2 Kisten Tegernseer Hell, 3 Kisten Spaten Münchner Hell und 1 Kiste Kulmbacher Festbier",
+    category: "Bayrisch",
   },
   {
     id: "demo-8",
-    title: "Gemischte Bestellung",
-    text: "Ich brauche 2 Kisten Tegernseer Hell, 4 Kisten Apfelschorle, 1 Karton Riesling Spätlese und 3 Pack Kräutertee",
-    category: "Gemischt",
+    title: "Gastro-Ausstattung (jb-x)",
+    text: "Ich brauche 2 Pack Weizenbier Gläser von Schott Zwiesel und 5 Flaschen Weyers Bier-Essig",
+    category: "Ausstattung",
   },
 ];
 
@@ -123,9 +123,9 @@ export default function Demo() {
             <CardContent>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <p className="text-sm text-blue-900">
-                  <strong>💡 Hinweis:</strong> Die Datenbank enthält 35 Getränkeartikel aus verschiedenen Kategorien
-                  (Bier, Wein, Softdrinks, Säfte, Kaffee, Tee, Spirituosen, Milchprodukte). 
-                  Die KI erkennt automatisch Artikel und Mengen aus der Sprachbestellung.
+                  <strong>🏨 jb-x Portal Integration:</strong> Die Datenbank enthält jetzt echte Getränkeartikel 
+                  aus dem jb-x Portal der Privathoteliers mit Original-Preisen und Lieferanten. 
+                  Alle Demo-Bestellungen verwenden reale Artikel-IDs und EAN-Codes.
                 </p>
               </div>
             </CardContent>
@@ -184,36 +184,36 @@ export default function Demo() {
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div className="bg-amber-50 p-3 rounded-lg border border-amber-200">
-                  <div className="font-semibold text-amber-900">🍺 Bier</div>
-                  <div className="text-amber-700 text-xs mt-1">5 Artikel</div>
+                  <div className="font-semibold text-amber-900">🍺 Premium Bier</div>
+                  <div className="text-amber-700 text-xs mt-1">Augustiner, Tegernseer, Spaten</div>
                 </div>
-                <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
-                  <div className="font-semibold text-purple-900">🍷 Wein</div>
-                  <div className="text-purple-700 text-xs mt-1">4 Artikel</div>
+                <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                  <div className="font-semibold text-blue-900">🍻 Weißbier</div>
+                  <div className="text-blue-700 text-xs mt-1">Paulaner, Erdinger, Franziskaner</div>
+                </div>
+                <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                  <div className="font-semibold text-green-900">🍺 Weihenstephan</div>
+                  <div className="text-green-700 text-xs mt-1">Festbier, KEG 30L/50L</div>
                 </div>
                 <div className="bg-red-50 p-3 rounded-lg border border-red-200">
                   <div className="font-semibold text-red-900">🥤 Softdrinks</div>
-                  <div className="text-red-700 text-xs mt-1">6 Artikel</div>
+                  <div className="text-red-700 text-xs mt-1">Coca-Cola, Fanta, Sprite</div>
+                </div>
+                <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                  <div className="font-semibold text-purple-900">🏺 Fass-Bier</div>
+                  <div className="text-purple-700 text-xs mt-1">Hofbräu, Paulaner 30L</div>
                 </div>
                 <div className="bg-orange-50 p-3 rounded-lg border border-orange-200">
-                  <div className="font-semibold text-orange-900">🧃 Säfte</div>
-                  <div className="text-orange-700 text-xs mt-1">4 Artikel</div>
-                </div>
-                <div className="bg-brown-50 p-3 rounded-lg border border-brown-200">
-                  <div className="font-semibold text-brown-900">☕ Kaffee & Tee</div>
-                  <div className="text-brown-700 text-xs mt-1">5 Artikel</div>
+                  <div className="font-semibold text-orange-900">🍯 Spezialitäten</div>
+                  <div className="text-orange-700 text-xs mt-1">Bier-Gelee, Bierlikör, Essig</div>
                 </div>
                 <div className="bg-indigo-50 p-3 rounded-lg border border-indigo-200">
-                  <div className="font-semibold text-indigo-900">🥃 Spirituosen</div>
-                  <div className="text-indigo-700 text-xs mt-1">6 Artikel</div>
+                  <div className="font-semibold text-indigo-900">🍽️ Ausstattung</div>
+                  <div className="text-indigo-700 text-xs mt-1">Gläser, Zubehör</div>
                 </div>
-                <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-                  <div className="font-semibold text-blue-900">🥛 Milchprodukte</div>
-                  <div className="text-blue-700 text-xs mt-1">5 Artikel</div>
-                </div>
-                <div className="bg-green-50 p-3 rounded-lg border border-green-200">
-                  <div className="font-semibold text-green-900">📦 Gesamt</div>
-                  <div className="text-green-700 text-xs mt-1">35 Artikel</div>
+                <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                  <div className="font-semibold text-gray-900">🏨 jb-x Portal</div>
+                  <div className="text-gray-700 text-xs mt-1">Echte Preise & Artikel-IDs</div>
                 </div>
               </div>
             </CardContent>
