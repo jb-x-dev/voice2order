@@ -22,6 +22,7 @@ export default function Catalog() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedSupplier, setSelectedSupplier] = useState<string>("all");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [showScanner, setShowScanner] = useState(false);
   
@@ -33,7 +34,21 @@ export default function Catalog() {
 
   const createOrderMutation = trpc.voiceOrder.create.useMutation();
 
-  const displayArticles = searchQuery.length > 2 ? searchResults : articles;
+  let displayArticles = searchQuery.length > 2 ? searchResults : articles;
+  
+  // Filter by supplier if selected
+  if (selectedSupplier !== "all" && displayArticles) {
+    displayArticles = displayArticles.filter(a => a.supplier === selectedSupplier);
+  }
+
+  // Get unique suppliers for filter
+  const allSuppliers = articles?.reduce((acc, article) => {
+    const supplier = article.supplier || "Unbekannt";
+    if (!acc.includes(supplier)) {
+      acc.push(supplier);
+    }
+    return acc;
+  }, [] as string[]).sort() || [];
 
   // Group articles by supplier
   const articlesBySupplier = displayArticles?.reduce((acc, article) => {
@@ -167,27 +182,71 @@ export default function Catalog() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    type="text"
-                    placeholder="Artikel suchen..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                <Button variant="outline" onClick={scanQRCode}>
-                  <QrCode className="h-4 w-4 mr-2" />
-                  QR scannen
-                </Button>
-                <Link href="/print-qr">
-                  <Button variant="outline">
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      type="text"
+                      placeholder="Artikel suchen..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                  <Button variant="outline" onClick={scanQRCode}>
                     <QrCode className="h-4 w-4 mr-2" />
-                    QR drucken
+                    QR scannen
                   </Button>
-                </Link>
+                  <Link href="/print-qr">
+                    <Button variant="outline">
+                      <QrCode className="h-4 w-4 mr-2" />
+                      QR drucken
+                    </Button>
+                  </Link>
+                </div>
+
+                {/* Supplier Filter */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm font-medium text-gray-700">Lieferant:</span>
+                  <Button
+                    size="sm"
+                    variant={selectedSupplier === "all" ? "default" : "outline"}
+                    onClick={() => setSelectedSupplier("all")}
+                  >
+                    Alle ({articles?.length || 0})
+                  </Button>
+                  {allSuppliers.slice(0, 8).map((supplier) => {
+                    const count = articles?.filter(a => a.supplier === supplier).length || 0;
+                    return (
+                      <Button
+                        key={supplier}
+                        size="sm"
+                        variant={selectedSupplier === supplier ? "default" : "outline"}
+                        onClick={() => setSelectedSupplier(supplier)}
+                      >
+                        {supplier} ({count})
+                      </Button>
+                    );
+                  })}
+                  {allSuppliers.length > 8 && (
+                    <select
+                      className="text-sm border rounded px-2 py-1"
+                      value={selectedSupplier}
+                      onChange={(e) => setSelectedSupplier(e.target.value)}
+                    >
+                      <option value="all">Weitere Lieferanten...</option>
+                      {allSuppliers.slice(8).map((supplier) => {
+                        const count = articles?.filter(a => a.supplier === supplier).length || 0;
+                        return (
+                          <option key={supplier} value={supplier}>
+                            {supplier} ({count})
+                          </option>
+                        );
+                      })}
+                    </select>
+                  )}
+                </div>
               </div>
 
               {showScanner && (
