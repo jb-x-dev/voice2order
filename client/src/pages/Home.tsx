@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { Mic, MicOff, Loader2, CheckCircle, XCircle, History } from "lucide-react";
+import { Mic, MicOff, Loader2, CheckCircle, XCircle, History, Package } from "lucide-react";
 import { useState, useRef } from "react";
 import { Link } from "wouter";
 
@@ -182,6 +182,17 @@ export default function Home() {
             <span className="text-sm text-gray-600">
               {user?.name || user?.email}
             </span>
+            <Link href="/demo">
+              <Button variant="default" size="sm">
+                🎯 Demo
+              </Button>
+            </Link>
+            <Link href="/articles">
+              <Button variant="outline" size="sm">
+                <Package className="h-4 w-4 mr-2" />
+                Artikel
+              </Button>
+            </Link>
             <Link href="/history">
               <Button variant="outline" size="sm">
                 <History className="h-4 w-4 mr-2" />

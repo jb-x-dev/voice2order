@@ -1,0 +1,475 @@
+import { drizzle } from "drizzle-orm/mysql2";
+import { articleHistory } from "../drizzle/schema";
+
+// Sample user ID - in production this would be the actual logged-in user
+const SAMPLE_USER_ID = "sample-user-001";
+
+// Common beverage articles in German hospitality
+const beverageArticles = [
+  // Beer
+  {
+    id: "bev-001",
+    userId: SAMPLE_USER_ID,
+    articleId: "76001",
+    articleName: "Augustiner Helles 0,5l Flasche",
+    supplier: "Getränke Müller GmbH",
+    ean: "4005571010101",
+    unit: "KISTE",
+    lastPrice: 1890, // 18.90 EUR per case
+    orderCount: 45,
+    lastOrderedAt: new Date("2025-10-15"),
+  },
+  {
+    id: "bev-002",
+    userId: SAMPLE_USER_ID,
+    articleId: "76002",
+    articleName: "Paulaner Weißbier 0,5l Flasche",
+    supplier: "Getränke Müller GmbH",
+    ean: "4005571020202",
+    unit: "KISTE",
+    lastPrice: 1950,
+    orderCount: 38,
+    lastOrderedAt: new Date("2025-10-14"),
+  },
+  {
+    id: "bev-003",
+    userId: SAMPLE_USER_ID,
+    articleId: "76003",
+    articleName: "Erdinger Weißbier alkoholfrei 0,5l",
+    supplier: "Getränke Müller GmbH",
+    ean: "4005571030303",
+    unit: "KISTE",
+    lastPrice: 2100,
+    orderCount: 22,
+    lastOrderedAt: new Date("2025-10-12"),
+  },
+  {
+    id: "bev-004",
+    userId: SAMPLE_USER_ID,
+    articleId: "76004",
+    articleName: "Tegernseer Hell 0,5l Flasche",
+    supplier: "Getränke Müller GmbH",
+    ean: "4005571040404",
+    unit: "KISTE",
+    lastPrice: 2250,
+    orderCount: 31,
+    lastOrderedAt: new Date("2025-10-16"),
+  },
+  {
+    id: "bev-005",
+    userId: SAMPLE_USER_ID,
+    articleId: "76005",
+    articleName: "Franziskaner Weißbier 0,5l",
+    supplier: "Getränke Müller GmbH",
+    ean: "4005571050505",
+    unit: "KISTE",
+    lastPrice: 1980,
+    orderCount: 19,
+    lastOrderedAt: new Date("2025-10-10"),
+  },
+
+  // Wine
+  {
+    id: "bev-006",
+    userId: SAMPLE_USER_ID,
+    articleId: "76006",
+    articleName: "Grauburgunder trocken 0,75l",
+    supplier: "Weinhandel Schmidt",
+    ean: "4005572060606",
+    unit: "KARTON",
+    lastPrice: 7200, // 72 EUR per case of 6
+    orderCount: 15,
+    lastOrderedAt: new Date("2025-10-13"),
+  },
+  {
+    id: "bev-007",
+    userId: SAMPLE_USER_ID,
+    articleId: "76007",
+    articleName: "Riesling Spätlese 0,75l",
+    supplier: "Weinhandel Schmidt",
+    ean: "4005572070707",
+    unit: "KARTON",
+    lastPrice: 8400,
+    orderCount: 12,
+    lastOrderedAt: new Date("2025-10-11"),
+  },
+  {
+    id: "bev-008",
+    userId: SAMPLE_USER_ID,
+    articleId: "76008",
+    articleName: "Rotwein Dornfelder trocken 0,75l",
+    supplier: "Weinhandel Schmidt",
+    ean: "4005572080808",
+    unit: "KARTON",
+    lastPrice: 6900,
+    orderCount: 18,
+    lastOrderedAt: new Date("2025-10-14"),
+  },
+  {
+    id: "bev-009",
+    userId: SAMPLE_USER_ID,
+    articleId: "76009",
+    articleName: "Prosecco Spumante DOC 0,75l",
+    supplier: "Weinhandel Schmidt",
+    ean: "4005572090909",
+    unit: "KARTON",
+    lastPrice: 5400,
+    orderCount: 25,
+    lastOrderedAt: new Date("2025-10-15"),
+  },
+
+  // Soft Drinks
+  {
+    id: "bev-010",
+    userId: SAMPLE_USER_ID,
+    articleId: "76010",
+    articleName: "Coca-Cola 0,33l Flasche",
+    supplier: "Getränke Müller GmbH",
+    ean: "4005573101010",
+    unit: "KISTE",
+    lastPrice: 1650,
+    orderCount: 52,
+    lastOrderedAt: new Date("2025-10-17"),
+  },
+  {
+    id: "bev-011",
+    userId: SAMPLE_USER_ID,
+    articleId: "76011",
+    articleName: "Fanta Orange 0,33l Flasche",
+    supplier: "Getränke Müller GmbH",
+    ean: "4005573111111",
+    unit: "KISTE",
+    lastPrice: 1650,
+    orderCount: 41,
+    lastOrderedAt: new Date("2025-10-17"),
+  },
+  {
+    id: "bev-012",
+    userId: SAMPLE_USER_ID,
+    articleId: "76012",
+    articleName: "Sprite 0,33l Flasche",
+    supplier: "Getränke Müller GmbH",
+    ean: "4005573121212",
+    unit: "KISTE",
+    lastPrice: 1650,
+    orderCount: 35,
+    lastOrderedAt: new Date("2025-10-16"),
+  },
+  {
+    id: "bev-013",
+    userId: SAMPLE_USER_ID,
+    articleId: "76013",
+    articleName: "Apfelschorle 0,5l Flasche",
+    supplier: "Getränke Müller GmbH",
+    ean: "4005573131313",
+    unit: "KISTE",
+    lastPrice: 1450,
+    orderCount: 48,
+    lastOrderedAt: new Date("2025-10-17"),
+  },
+  {
+    id: "bev-014",
+    userId: SAMPLE_USER_ID,
+    articleId: "76014",
+    articleName: "Mineralwasser spritzig 0,75l",
+    supplier: "Getränke Müller GmbH",
+    ean: "4005573141414",
+    unit: "KISTE",
+    lastPrice: 980,
+    orderCount: 67,
+    lastOrderedAt: new Date("2025-10-18"),
+  },
+  {
+    id: "bev-015",
+    userId: SAMPLE_USER_ID,
+    articleId: "76015",
+    articleName: "Mineralwasser still 0,75l",
+    supplier: "Getränke Müller GmbH",
+    ean: "4005573151515",
+    unit: "KISTE",
+    lastPrice: 980,
+    orderCount: 59,
+    lastOrderedAt: new Date("2025-10-18"),
+  },
+
+  // Juices
+  {
+    id: "bev-016",
+    userId: SAMPLE_USER_ID,
+    articleId: "76016",
+    articleName: "Orangensaft 100% 1,0l",
+    supplier: "Fruchtsaft Vertrieb Nord",
+    ean: "4005574161616",
+    unit: "KARTON",
+    lastPrice: 2850, // per case of 6
+    orderCount: 28,
+    lastOrderedAt: new Date("2025-10-15"),
+  },
+  {
+    id: "bev-017",
+    userId: SAMPLE_USER_ID,
+    articleId: "76017",
+    articleName: "Apfelsaft naturtrüb 1,0l",
+    supplier: "Fruchtsaft Vertrieb Nord",
+    ean: "4005574171717",
+    unit: "KARTON",
+    lastPrice: 2450,
+    orderCount: 33,
+    lastOrderedAt: new Date("2025-10-16"),
+  },
+  {
+    id: "bev-018",
+    userId: SAMPLE_USER_ID,
+    articleId: "76018",
+    articleName: "Multivitaminsaft 1,0l",
+    supplier: "Fruchtsaft Vertrieb Nord",
+    ean: "4005574181818",
+    unit: "KARTON",
+    lastPrice: 2650,
+    orderCount: 21,
+    lastOrderedAt: new Date("2025-10-13"),
+  },
+  {
+    id: "bev-019",
+    userId: SAMPLE_USER_ID,
+    articleId: "76019",
+    articleName: "Tomatensaft 1,0l",
+    supplier: "Fruchtsaft Vertrieb Nord",
+    ean: "4005574191919",
+    unit: "KARTON",
+    lastPrice: 2350,
+    orderCount: 14,
+    lastOrderedAt: new Date("2025-10-10"),
+  },
+
+  // Coffee & Tea
+  {
+    id: "bev-020",
+    userId: SAMPLE_USER_ID,
+    articleId: "76020",
+    articleName: "Espresso Bohnen 1kg Arabica",
+    supplier: "Kaffee Import Bayern",
+    ean: "4005575202020",
+    unit: "KG",
+    lastPrice: 2890,
+    orderCount: 42,
+    lastOrderedAt: new Date("2025-10-17"),
+  },
+  {
+    id: "bev-021",
+    userId: SAMPLE_USER_ID,
+    articleId: "76021",
+    articleName: "Kaffee Crema gemahlen 500g",
+    supplier: "Kaffee Import Bayern",
+    ean: "4005575212121",
+    unit: "PACK",
+    lastPrice: 1450,
+    orderCount: 36,
+    lastOrderedAt: new Date("2025-10-16"),
+  },
+  {
+    id: "bev-022",
+    userId: SAMPLE_USER_ID,
+    articleId: "76022",
+    articleName: "Schwarzer Tee Assam 100 Beutel",
+    supplier: "Tee & Mehr GmbH",
+    ean: "4005575222222",
+    unit: "PACK",
+    lastPrice: 890,
+    orderCount: 18,
+    lastOrderedAt: new Date("2025-10-12"),
+  },
+  {
+    id: "bev-023",
+    userId: SAMPLE_USER_ID,
+    articleId: "76023",
+    articleName: "Grüner Tee Sencha 100 Beutel",
+    supplier: "Tee & Mehr GmbH",
+    ean: "4005575232323",
+    unit: "PACK",
+    lastPrice: 1190,
+    orderCount: 15,
+    lastOrderedAt: new Date("2025-10-11"),
+  },
+  {
+    id: "bev-024",
+    userId: SAMPLE_USER_ID,
+    articleId: "76024",
+    articleName: "Kräutertee Mischung 100 Beutel",
+    supplier: "Tee & Mehr GmbH",
+    ean: "4005575242424",
+    unit: "PACK",
+    lastPrice: 950,
+    orderCount: 22,
+    lastOrderedAt: new Date("2025-10-14"),
+  },
+
+  // Spirits
+  {
+    id: "bev-025",
+    userId: SAMPLE_USER_ID,
+    articleId: "76025",
+    articleName: "Obstler 38% 0,7l",
+    supplier: "Spirituosen Fachhandel",
+    ean: "4005576252525",
+    unit: "FLASCHE",
+    lastPrice: 1890,
+    orderCount: 8,
+    lastOrderedAt: new Date("2025-10-09"),
+  },
+  {
+    id: "bev-026",
+    userId: SAMPLE_USER_ID,
+    articleId: "76026",
+    articleName: "Williams Birne 40% 0,7l",
+    supplier: "Spirituosen Fachhandel",
+    ean: "4005576262626",
+    unit: "FLASCHE",
+    lastPrice: 2450,
+    orderCount: 6,
+    lastOrderedAt: new Date("2025-10-08"),
+  },
+  {
+    id: "bev-027",
+    userId: SAMPLE_USER_ID,
+    articleId: "76027",
+    articleName: "Grappa 40% 0,7l",
+    supplier: "Spirituosen Fachhandel",
+    ean: "4005576272727",
+    unit: "FLASCHE",
+    lastPrice: 2190,
+    orderCount: 9,
+    lastOrderedAt: new Date("2025-10-10"),
+  },
+  {
+    id: "bev-028",
+    userId: SAMPLE_USER_ID,
+    articleId: "76028",
+    articleName: "Vodka Premium 40% 0,7l",
+    supplier: "Spirituosen Fachhandel",
+    ean: "4005576282828",
+    unit: "FLASCHE",
+    lastPrice: 1650,
+    orderCount: 11,
+    lastOrderedAt: new Date("2025-10-12"),
+  },
+  {
+    id: "bev-029",
+    userId: SAMPLE_USER_ID,
+    articleId: "76029",
+    articleName: "Gin London Dry 40% 0,7l",
+    supplier: "Spirituosen Fachhandel",
+    ean: "4005576292929",
+    unit: "FLASCHE",
+    lastPrice: 2890,
+    orderCount: 13,
+    lastOrderedAt: new Date("2025-10-15"),
+  },
+  {
+    id: "bev-030",
+    userId: SAMPLE_USER_ID,
+    articleId: "76030",
+    articleName: "Whisky Single Malt 0,7l",
+    supplier: "Spirituosen Fachhandel",
+    ean: "4005576303030",
+    unit: "FLASCHE",
+    lastPrice: 4500,
+    orderCount: 5,
+    lastOrderedAt: new Date("2025-10-07"),
+  },
+
+  // Milk & Cream
+  {
+    id: "bev-031",
+    userId: SAMPLE_USER_ID,
+    articleId: "76031",
+    articleName: "Vollmilch 3,5% 1,0l",
+    supplier: "Molkerei Alpenland",
+    ean: "4005577313131",
+    unit: "KARTON",
+    lastPrice: 1450, // per case of 12
+    orderCount: 55,
+    lastOrderedAt: new Date("2025-10-18"),
+  },
+  {
+    id: "bev-032",
+    userId: SAMPLE_USER_ID,
+    articleId: "76032",
+    articleName: "Milch laktosefrei 1,5% 1,0l",
+    supplier: "Molkerei Alpenland",
+    ean: "4005577323232",
+    unit: "KARTON",
+    lastPrice: 1850,
+    orderCount: 24,
+    lastOrderedAt: new Date("2025-10-17"),
+  },
+  {
+    id: "bev-033",
+    userId: SAMPLE_USER_ID,
+    articleId: "76033",
+    articleName: "Sahne 30% 1,0l",
+    supplier: "Molkerei Alpenland",
+    ean: "4005577333333",
+    unit: "LITER",
+    lastPrice: 450,
+    orderCount: 38,
+    lastOrderedAt: new Date("2025-10-18"),
+  },
+  {
+    id: "bev-034",
+    userId: SAMPLE_USER_ID,
+    articleId: "76034",
+    articleName: "Hafermilch Barista 1,0l",
+    supplier: "Bio Drinks GmbH",
+    ean: "4005577343434",
+    unit: "KARTON",
+    lastPrice: 2650,
+    orderCount: 29,
+    lastOrderedAt: new Date("2025-10-16"),
+  },
+  {
+    id: "bev-035",
+    userId: SAMPLE_USER_ID,
+    articleId: "76035",
+    articleName: "Sojamilch ungesüßt 1,0l",
+    supplier: "Bio Drinks GmbH",
+    ean: "4005577353535",
+    unit: "KARTON",
+    lastPrice: 2350,
+    orderCount: 17,
+    lastOrderedAt: new Date("2025-10-14"),
+  },
+];
+
+async function seedBeverages() {
+  if (!process.env.DATABASE_URL) {
+    console.error("DATABASE_URL not set");
+    process.exit(1);
+  }
+
+  const db = drizzle(process.env.DATABASE_URL);
+
+  console.log("🍺 Seeding beverage articles...");
+
+  for (const article of beverageArticles) {
+    try {
+      await db.insert(articleHistory).values(article);
+      console.log(`✓ Added: ${article.articleName}`);
+    } catch (error) {
+      console.error(`✗ Failed to add ${article.articleName}:`, error);
+    }
+  }
+
+  console.log(`\n✅ Seeded ${beverageArticles.length} beverage articles`);
+  console.log("\nSample voice orders you can try:");
+  console.log("- 'Wir brauchen 3 Kisten Augustiner Helles und 2 Kisten Paulaner Weißbier'");
+  console.log("- 'Bestelle 5 Kisten Coca Cola, 3 Kisten Fanta und 4 Kisten Mineralwasser'");
+  console.log("- '2 Karton Orangensaft und 3 Karton Apfelsaft bitte'");
+  console.log("- 'Ich brauche 2 Kilo Espresso Bohnen und 5 Pack Kaffee Crema'");
+  console.log("- '1 Karton Grauburgunder und 2 Karton Prosecco'");
+  
+  process.exit(0);
+}
+
+seedBeverages();
+
