@@ -8,51 +8,73 @@ import { Link, useLocation } from "wouter";
 const DEMO_ORDERS = [
   {
     id: "demo-1",
-    title: "Premium Bier (jb-x)",
-    text: "Wir brauchen 3 Kisten Augustiner Hell und 2 Kisten Paulaner Weißbier",
-    category: "Bier",
+    title: "Softdrinks",
+    text: "3 Kisten Coca Cola und 2 Kisten Sprite",
+    category: "Getränke",
+    supplier: "Baer-Mühle & Otto Pachmayr",
   },
   {
     id: "demo-2",
-    title: "Fass-Bier (jb-x)",
-    text: "Bestelle 2 Fass Hofbräu Festbier und 1 Fass Paulaner Festbier",
-    category: "Fass-Bier",
+    title: "Hackfleisch",
+    text: "5 Kilo Rinder Hackfleisch und 2 Packungen Kalbs Hackfleisch",
+    category: "Fleisch",
+    supplier: "Metzgerei Haller & Bierbichler",
   },
   {
     id: "demo-3",
-    title: "Softdrinks (jb-x)",
-    text: "5 Kisten Coca Cola, 3 Kisten Fanta und 4 Kisten Mineralwasser spritzig",
-    category: "Softdrinks",
+    title: "Champagner",
+    text: "2 Flaschen Champagne Henriot Brut Souverain und 1 Flasche Blanc de Blancs",
+    category: "Wein",
+    supplier: "AllAboutWine GmbH",
   },
   {
     id: "demo-4",
-    title: "Weihenstephan (jb-x)",
-    text: "Ich brauche 2 Kisten Weihenstephaner Festbier und 1 Weihenstephaner 30L KEG",
-    category: "Premium",
+    title: "Premium Gin",
+    text: "1 Flasche Monkey 47 Gin und 1 Flasche Hendricks Gin",
+    category: "Spirituosen",
+    supplier: "Tabak Grätz & Hamberger",
   },
   {
     id: "demo-5",
-    title: "Spezialitäten (jb-x)",
-    text: "1 Karton Tannenzäpfle Bier-Gelee und 2 Flaschen Allgäuer Bierlikör",
-    category: "Spezialitäten",
+    title: "Premium Fleisch",
+    text: "3 Stück Delta Dry Aged Roastbeef und 2 Kalbs-Tomahawk",
+    category: "Fleisch",
+    supplier: "Delta Hamburg",
   },
   {
     id: "demo-6",
-    title: "Weißbier Mix (jb-x)",
-    text: "Wir benötigen 3 Kisten Erdinger alkoholfrei, 2 Kisten Franziskaner Weißbier und 1 Kiste Paulaner Hefe-Weißbier",
-    category: "Weißbier",
+    title: "Fisch",
+    text: "5 Karton Wolfsbarschfilet und 3 Kilo Dorade Royalefilet",
+    category: "Fisch",
+    supplier: "Deutsche See & R+S Gourmets",
   },
   {
     id: "demo-7",
-    title: "Bayrische Klassiker (jb-x)",
-    text: "Bestelle 2 Kisten Tegernseer Hell, 3 Kisten Spaten Münchner Hell und 1 Kiste Kulmbacher Festbier",
-    category: "Bayrisch",
+    title: "Backwaren",
+    text: "10 Packungen Finnenbrötchen und 5 Karton HUG Windbeute",
+    category: "Backwaren",
+    supplier: "EDNA",
   },
   {
     id: "demo-8",
-    title: "Gastro-Ausstattung (jb-x)",
-    text: "Ich brauche 2 Pack Weizenbier Gläser von Schott Zwiesel und 5 Flaschen Weyers Bier-Essig",
-    category: "Ausstattung",
+    title: "Wein",
+    text: "2 Flaschen Pink Vineyard Rose und 3 Flaschen Secco Carlo",
+    category: "Wein",
+    supplier: "Karl Pfaffmann",
+  },
+  {
+    id: "demo-9",
+    title: "Frischware",
+    text: "20 Kilo Karotten und 5 Kilo Miesmuscheln",
+    category: "Gemüse & Fisch",
+    supplier: "Fritz Gutskunst & Kagerer",
+  },
+  {
+    id: "demo-10",
+    title: "Premium Whisky",
+    text: "1 Flasche Balvenie 21 Years und 1 Flasche Caol Ila 18 Years",
+    category: "Spirituosen",
+    supplier: "Tabak Grätz",
   },
 ];
 
@@ -123,9 +145,9 @@ export default function Demo() {
             <CardContent>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <p className="text-sm text-blue-900">
-                  <strong>🏨 jb-x Portal Integration:</strong> Die Datenbank enthält jetzt echte Getränkeartikel 
-                  aus dem jb-x Portal der Privathoteliers mit Original-Preisen und Lieferanten. 
-                  Alle Demo-Bestellungen verwenden reale Artikel-IDs und EAN-Codes.
+                  <strong>🏨 Ihre Top-Bestellartikel:</strong> Die Datenbank enthält <strong>39 Artikel</strong>, 
+                  die Sie am häufigsten bei den Privathoteliers bestellen - mit Original-Preisen, EAN-Codes und echten Lieferanten 
+                  aus Ihrem jb-x Portal-Account.
                 </p>
               </div>
             </CardContent>
@@ -139,10 +161,13 @@ export default function Demo() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <CardTitle className="text-lg">{demoOrder.title}</CardTitle>
-                      <CardDescription className="mt-1">
+                      <CardDescription className="mt-1 space-y-1">
                         <span className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
                           {demoOrder.category}
                         </span>
+                        <div className="text-xs text-gray-600 mt-1">
+                          {demoOrder.supplier}
+                        </div>
                       </CardDescription>
                     </div>
                   </div>
@@ -179,41 +204,48 @@ export default function Demo() {
           {/* Available Articles Info */}
           <Card>
             <CardHeader>
-              <CardTitle>Verfügbare Artikel in der Datenbank</CardTitle>
+              <CardTitle>Ihre Top-Lieferanten</CardTitle>
+              <CardDescription>
+                Die 19 Lieferanten, von denen Sie am häufigsten bestellen
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div className="bg-amber-50 p-3 rounded-lg border border-amber-200">
-                  <div className="font-semibold text-amber-900">🍺 Premium Bier</div>
-                  <div className="text-amber-700 text-xs mt-1">Augustiner, Tegernseer, Spaten</div>
-                </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
                 <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-                  <div className="font-semibold text-blue-900">🍻 Weißbier</div>
-                  <div className="text-blue-700 text-xs mt-1">Paulaner, Erdinger, Franziskaner</div>
+                  <div className="font-semibold text-blue-900">Tabak Grätz</div>
+                  <div className="text-blue-700 text-xs mt-1">6 Spirituosen</div>
                 </div>
-                <div className="bg-green-50 p-3 rounded-lg border border-green-200">
-                  <div className="font-semibold text-green-900">🍺 Weihenstephan</div>
-                  <div className="text-green-700 text-xs mt-1">Festbier, KEG 30L/50L</div>
-                </div>
-                <div className="bg-red-50 p-3 rounded-lg border border-red-200">
-                  <div className="font-semibold text-red-900">🥤 Softdrinks</div>
-                  <div className="text-red-700 text-xs mt-1">Coca-Cola, Fanta, Sprite</div>
-                </div>
-                <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
-                  <div className="font-semibold text-purple-900">🏺 Fass-Bier</div>
-                  <div className="text-purple-700 text-xs mt-1">Hofbräu, Paulaner 30L</div>
+                <div className="bg-amber-50 p-3 rounded-lg border border-amber-200">
+                  <div className="font-semibold text-amber-900">Delta Hamburg</div>
+                  <div className="text-amber-700 text-xs mt-1">5 Premium Fleisch</div>
                 </div>
                 <div className="bg-orange-50 p-3 rounded-lg border border-orange-200">
-                  <div className="font-semibold text-orange-900">🍯 Spezialitäten</div>
-                  <div className="text-orange-700 text-xs mt-1">Bier-Gelee, Bierlikör, Essig</div>
+                  <div className="font-semibold text-orange-900">EDNA</div>
+                  <div className="text-orange-700 text-xs mt-1">5 Backwaren</div>
                 </div>
-                <div className="bg-indigo-50 p-3 rounded-lg border border-indigo-200">
-                  <div className="font-semibold text-indigo-900">🍽️ Ausstattung</div>
-                  <div className="text-indigo-700 text-xs mt-1">Gläser, Zubehör</div>
+                <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                  <div className="font-semibold text-green-900">Hamberger</div>
+                  <div className="text-green-700 text-xs mt-1">4 Lebensmittel</div>
+                </div>
+                <div className="bg-cyan-50 p-3 rounded-lg border border-cyan-200">
+                  <div className="font-semibold text-cyan-900">Deutsche See</div>
+                  <div className="text-cyan-700 text-xs mt-1">2 Fisch</div>
+                </div>
+                <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                  <div className="font-semibold text-purple-900">AllAboutWine</div>
+                  <div className="text-purple-700 text-xs mt-1">2 Champagner</div>
+                </div>
+                <div className="bg-pink-50 p-3 rounded-lg border border-pink-200">
+                  <div className="font-semibold text-pink-900">Karl Pfaffmann</div>
+                  <div className="text-pink-700 text-xs mt-1">2 Wein</div>
+                </div>
+                <div className="bg-red-50 p-3 rounded-lg border border-red-200">
+                  <div className="font-semibold text-red-900">BOSFOOD</div>
+                  <div className="text-red-700 text-xs mt-1">2 Gastro-Bedarf</div>
                 </div>
                 <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                  <div className="font-semibold text-gray-900">🏨 jb-x Portal</div>
-                  <div className="text-gray-700 text-xs mt-1">Echte Preise & Artikel-IDs</div>
+                  <div className="font-semibold text-gray-900">+ 11 weitere</div>
+                  <div className="text-gray-700 text-xs mt-1">je 1 Artikel</div>
                 </div>
               </div>
             </CardContent>
