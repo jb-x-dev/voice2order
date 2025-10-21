@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
@@ -9,6 +10,7 @@ import { Link } from "wouter";
 
 export default function Home() {
   const { user, loading, isAuthenticated } = useAuth();
+  const { totalItems, totalPrice } = useCart();
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -197,6 +199,21 @@ export default function Home() {
                 <Button variant="default" size="lg" className="w-full">
                   <Package className="h-5 w-5 mr-2" />
                   Lieferanten
+                </Button>
+              </Link>
+              <Link href="/cart">
+                <Button 
+                  variant={totalItems > 0 ? "default" : "outline"} 
+                  size="lg" 
+                  className="w-full relative"
+                >
+                  <ShoppingCart className="h-5 w-5 mr-2" />
+                  Warenkorb
+                  {totalItems > 0 && (
+                    <span className="ml-2 bg-white text-blue-600 px-2 py-0.5 rounded-full text-xs font-bold">
+                      {totalItems}
+                    </span>
+                  )}
                 </Button>
               </Link>
             <Link href="/articles">

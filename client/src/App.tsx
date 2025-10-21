@@ -12,6 +12,7 @@ import Articles from "./pages/Articles";
 import Catalog from "./pages/Catalog";
 import Suppliers from "./pages/Suppliers";
 import PrintQRCodes from "./pages/PrintQRCodes";
+import Cart from "./pages/Cart";
 
 function Router() {
   return (
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/demo" component={Demo} />
       <Route path="/catalog" component={Catalog} />
       <Route path="/suppliers" component={Suppliers} />
+      <Route path="/cart" component={Cart} />
       <Route path="/articles" component={Articles} />
       <Route path="/print-qr-codes" component={PrintQRCodes} />
       <Route path={"/order/:id"} component={OrderDetail} />
