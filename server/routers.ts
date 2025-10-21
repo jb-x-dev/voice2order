@@ -8,6 +8,8 @@ import { transcribeAudio } from "./_core/voiceTranscription";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { adminRouter } from "./adminRouter";
 import { publicSeedRouter } from "./publicSeedRouter";
+import { importRouter } from "./importRouter";
+import { autoSeedForUser } from "./autoSeedMiddleware";
 import * as db from "./db";
 
 // Helper to generate unique IDs
@@ -19,6 +21,7 @@ export const appRouter = router({
   system: systemRouter,
   admin: adminRouter,
   seed: publicSeedRouter,
+  import: importRouter,
 
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
@@ -103,8 +106,10 @@ export const appRouter = router({
   }),
 
   articleHistory: router({
-    // Get user's article history
+    // Get user article history
     list: protectedProcedure.query(async ({ ctx }) => {
+      // Auto-seed data for joachim.braun@jb-x.com on first access
+      await autoSeedForUser(ctx.user.id);
       return db.getUserArticleHistory(ctx.user.id);
     }),
 

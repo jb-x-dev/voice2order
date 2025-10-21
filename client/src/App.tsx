@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { CartProvider } from "./contexts/CartContext";
 import Home from "./pages/Home";
 import Admin from "./pages/Admin";
+import DataImport from "./pages/DataImport";
 import OrderDetail from "./pages/OrderDetail";
 import Demo from "./pages/Demo";
 import Articles from "./pages/Articles";
@@ -21,6 +22,7 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/admin"} component={Admin} />
+      <Route path={"/import"} component={DataImport} />
       <Route path="/catalog" component={Catalog} />
       <Route path={"/suppliers"} component={Suppliers} />
       <Route path={"/order-suggestions"} component={OrderSuggestions} />
