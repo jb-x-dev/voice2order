@@ -6,6 +6,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { CartProvider } from "./contexts/CartContext";
 import Home from "./pages/Home";
+import Admin from "./pages/Admin";
 import OrderDetail from "./pages/OrderDetail";
 import Demo from "./pages/Demo";
 import Articles from "./pages/Articles";
@@ -19,14 +20,16 @@ function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
-      <Route path="/demo" component={Demo} />
-      <Route path="/catalog" component={Catalog} />      <Route path={"/suppliers"} component={Suppliers} />
-      <Route path={"/order-suggestions"} component={OrderSuggestions} />      <Route path="/cart" component={Cart} />
+      <Route path={"/admin"} component={Admin} />
+      <Route path="/catalog" component={Catalog} />
+      <Route path={"/suppliers"} component={Suppliers} />
+      <Route path={"/order-suggestions"} component={OrderSuggestions} />
+      <Route path="/cart" component={Cart} />
       <Route path="/articles" component={Articles} />
+      <Route path="/demo" component={Demo} />
       <Route path="/print-qr-codes" component={PrintQRCodes} />
       <Route path={"/order/:id"} component={OrderDetail} />
       <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>
   );
@@ -35,16 +38,13 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="light"
-        // switchable
-      >
-        <CartProvider>
-          <TooltipProvider>
+      <ThemeProvider defaultTheme="light">
+        <TooltipProvider>
+          <CartProvider>
             <Toaster />
             <Router />
-          </TooltipProvider>
-        </CartProvider>
+          </CartProvider>
+        </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

@@ -1,26 +1,26 @@
-import { drizzle } from "drizzle-orm/mysql2";
+import { getDb } from "../server/db";
 import { articleHistory, weeklyOrderSuggestions } from "../drizzle/schema";
+import { eq } from "drizzle-orm";
 
-async function main() {
-  const db = drizzle(process.env.DATABASE_URL!);
-  
-  console.log("Checking database...\n");
-  
-  // Check articles
-  const articles = await db.select().from(articleHistory);
-  console.log(`Articles in DB: ${articles.length}`);
-  if (articles.length > 0) {
-    console.log("Sample article:", articles[0]);
-  }
-  
-  // Check suggestions
-  const suggestions = await db.select().from(weeklyOrderSuggestions);
-  console.log(`\nWeekly suggestions in DB: ${suggestions.length}`);
-  if (suggestions.length > 0) {
-    console.log("Sample suggestion:", suggestions[0]);
-  }
-  
-  process.exit(0);
+const db = await getDb();
+if (!db) {
+  console.log("❌ Database not available");
+  process.exit(1);
 }
 
-main().catch(console.error);
+const userId = "aTv8Rr9RUBidduJWt9BXdV";
+
+const articles = await db.select().from(articleHistory).where(eq(articleHistory.userId, userId));
+const suggestions = await db.select().from(weeklyOrderSuggestions).where(eq(weeklyOrderSuggestions.userId, userId));
+
+console.log(`✅ Articles: ${articles.length}`);
+console.log(`✅ Weekly suggestions: ${suggestions.length}`);
+
+if (articles.length > 0) {
+  console.log(`\nSample articles:`);
+  articles.slice(0, 3).forEach(a => {
+    console.log(`  - ${a.articleName} (${a.supplier})`);
+  });
+}
+
+process.exit(0);

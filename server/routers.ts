@@ -6,6 +6,7 @@ import { invokeLLM } from "./_core/llm";
 import { systemRouter } from "./_core/systemRouter";
 import { transcribeAudio } from "./_core/voiceTranscription";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
+import { adminRouter } from "./adminRouter";
 import * as db from "./db";
 
 // Helper to generate unique IDs
@@ -15,6 +16,7 @@ function generateId() {
 
 export const appRouter = router({
   system: systemRouter,
+  admin: adminRouter,
 
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
