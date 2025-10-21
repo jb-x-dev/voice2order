@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { Mic, MicOff, Loader2, CheckCircle, XCircle, History, Package, ShoppingCart } from "lucide-react";
+import { Mic, MicOff, Loader2, CheckCircle, XCircle, History, Package, ShoppingCart, TrendingUp } from "lucide-react";
 import { useState, useRef } from "react";
 import { Link } from "wouter";
 
