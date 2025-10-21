@@ -11,6 +11,7 @@ import Demo from "./pages/Demo";
 import Articles from "./pages/Articles";
 import Catalog from "./pages/Catalog";
 import Suppliers from "./pages/Suppliers";
+import OrderSuggestions from "./pages/OrderSuggestions";
 import PrintQRCodes from "./pages/PrintQRCodes";
 import Cart from "./pages/Cart";
 
@@ -19,9 +20,8 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path="/demo" component={Demo} />
-      <Route path="/catalog" component={Catalog} />
-      <Route path="/suppliers" component={Suppliers} />
-      <Route path="/cart" component={Cart} />
+      <Route path="/catalog" component={Catalog} />      <Route path={"/suppliers"} component={Suppliers} />
+      <Route path={"/order-suggestions"} component={OrderSuggestions} />      <Route path="/cart" component={Cart} />
       <Route path="/articles" component={Articles} />
       <Route path="/print-qr-codes" component={PrintQRCodes} />
       <Route path={"/order/:id"} component={OrderDetail} />

@@ -3,18 +3,15 @@ import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, 
   users,
-  voiceOrders,
-  InsertVoiceOrder,
-  VoiceOrder,
-  orderItems,
-  InsertOrderItem,
-  OrderItem,
   articleHistory,
   InsertArticleHistory,
   ArticleHistory,
-  jbxSettings,
-  InsertJbxSettings,
-  JbxSettings
+  orders,
+  InsertOrder,
+  Order,
+  weeklyOrderSuggestions,
+  InsertWeeklyOrderSuggestion,
+  WeeklyOrderSuggestion
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -100,70 +97,46 @@ export async function getUser(id: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// Voice Orders
-export async function createVoiceOrder(order: InsertVoiceOrder): Promise<VoiceOrder> {
+// Orders
+export async function createOrder(order: InsertOrder): Promise<Order> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  await db.insert(voiceOrders).values(order);
-  const result = await db.select().from(voiceOrders).where(eq(voiceOrders.id, order.id!)).limit(1);
+  await db.insert(orders).values(order);
+  const result = await db.select().from(orders).where(eq(orders.id, order.id!)).limit(1);
   return result[0];
 }
 
-export async function getVoiceOrder(id: string): Promise<VoiceOrder | undefined> {
+export async function getOrder(id: string): Promise<Order | undefined> {
   const db = await getDb();
   if (!db) return undefined;
   
-  const result = await db.select().from(voiceOrders).where(eq(voiceOrders.id, id)).limit(1);
+  const result = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 
-export async function getUserVoiceOrders(userId: string): Promise<VoiceOrder[]> {
+export async function getUserOrders(userId: string): Promise<Order[]> {
   const db = await getDb();
   if (!db) return [];
   
-  return db.select().from(voiceOrders)
-    .where(eq(voiceOrders.userId, userId))
-    .orderBy(desc(voiceOrders.createdAt))
+  return db.select().from(orders)
+    .where(eq(orders.userId, userId))
+    .orderBy(desc(orders.createdAt))
     .limit(50);
 }
 
-export async function updateVoiceOrderStatus(id: string, status: VoiceOrder['status'], transcription?: string) {
+export async function updateOrderStatus(id: string, status: Order['status'], transcription?: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const updateData: any = { status };
+  const updateData: any = { status, updatedAt: new Date() };
   if (transcription !== undefined) {
     updateData.transcription = transcription;
   }
   
-  await db.update(voiceOrders)
+  await db.update(orders)
     .set(updateData)
-    .where(eq(voiceOrders.id, id));
-}
-
-// Order Items
-export async function createOrderItem(item: InsertOrderItem): Promise<OrderItem> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  await db.insert(orderItems).values(item);
-  const result = await db.select().from(orderItems).where(eq(orderItems.id, item.id!)).limit(1);
-  return result[0];
-}
-
-export async function getOrderItems(voiceOrderId: string): Promise<OrderItem[]> {
-  const db = await getDb();
-  if (!db) return [];
-  
-  return db.select().from(orderItems).where(eq(orderItems.voiceOrderId, voiceOrderId));
-}
-
-export async function updateOrderItem(id: string, updates: Partial<OrderItem>) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  await db.update(orderItems).set(updates).where(eq(orderItems.id, id));
+    .where(eq(orders.id, id));
 }
 
 // Article History
@@ -201,27 +174,23 @@ export async function searchArticleHistory(userId: string, query: string): Promi
   );
 }
 
-// jb-x Settings
-export async function getJbxSettings(userId: string): Promise<JbxSettings | undefined> {
+// Weekly Order Suggestions
+export async function getWeeklyOrderSuggestions(userId: string): Promise<WeeklyOrderSuggestion[]> {
   const db = await getDb();
-  if (!db) return undefined;
+  if (!db) return [];
   
-  const result = await db.select().from(jbxSettings).where(eq(jbxSettings.userId, userId)).limit(1);
-  return result.length > 0 ? result[0] : undefined;
+  return db.select().from(weeklyOrderSuggestions)
+    .where(eq(weeklyOrderSuggestions.userId, userId))
+    .orderBy(desc(weeklyOrderSuggestions.weekStartDate))
+    .limit(20);
 }
 
-export async function upsertJbxSettings(settings: InsertJbxSettings) {
+export async function createWeeklyOrderSuggestion(suggestion: InsertWeeklyOrderSuggestion): Promise<WeeklyOrderSuggestion> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  await db.insert(jbxSettings).values(settings).onDuplicateKeyUpdate({
-    set: {
-      jbxUsername: settings.jbxUsername,
-      jbxPassword: settings.jbxPassword,
-      jbxOrganization: settings.jbxOrganization,
-      defaultCostCenter: settings.defaultCostCenter,
-      updatedAt: new Date(),
-    }
-  });
+  await db.insert(weeklyOrderSuggestions).values(suggestion);
+  const result = await db.select().from(weeklyOrderSuggestions).where(eq(weeklyOrderSuggestions.id, suggestion.id!)).limit(1);
+  return result[0];
 }
 

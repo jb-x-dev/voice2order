@@ -15,6 +15,13 @@
       "when": 1760985528656,
       "tag": "0001_lyrical_rocket_racer",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1761019299439,
+      "tag": "0002_secret_king_cobra",
+      "breakpoints": true
     }
   ]
 }

@@ -35,7 +35,7 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         const orderId = generateId();
-        const order = await db.createVoiceOrder({
+        const order = await db.createOrder({
           id: orderId,
           userId: ctx.user.id,
           audioUrl: input.audioUrl,
@@ -52,7 +52,7 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         try {
-          await db.updateVoiceOrderStatus(input.orderId, "processing");
+          await db.updateOrderStatus(input.orderId, "processing");
           
           const result = await transcribeAudio({
             audioUrl: input.audioUrl,
@@ -64,14 +64,14 @@ export const appRouter = router({
             throw new Error(result.error);
           }
 
-          await db.updateVoiceOrderStatus(input.orderId, "completed", result.text);
+          await db.updateOrderStatus(input.orderId, "completed", result.text);
           
           return {
             transcription: result.text,
             language: result.language,
           };
         } catch (error) {
-          await db.updateVoiceOrderStatus(input.orderId, "error");
+          await db.updateOrderStatus(input.orderId, "failed");
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Transkription fehlgeschlagen",
@@ -79,180 +79,22 @@ export const appRouter = router({
         }
       }),
 
-    // Parse transcription into order items using LLM
-    parseTranscription: protectedProcedure
-      .input(z.object({
-        orderId: z.string(),
-        transcription: z.string(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        try {
-          const response = await invokeLLM({
-            messages: [
-              {
-                role: "system",
-                content: `Du bist ein Assistent für die Verarbeitung von Bestellungen in Hotels und Restaurants. 
-Extrahiere aus der gesprochenen Bestellung alle Artikel mit Mengen und Einheiten.
-Gib das Ergebnis als JSON-Array zurück mit folgender Struktur:
-[
-  {
-    "articleName": "Name des Artikels",
-    "quantity": Anzahl als Zahl,
-    "unit": "Einheit (z.B. Kilo, Liter, Stück, Packung)"
-  }
-]`
-              },
-              {
-                role: "user",
-                content: `Bestellung: ${input.transcription}`
-              }
-            ],
-            response_format: {
-              type: "json_schema",
-              json_schema: {
-                name: "order_items",
-                strict: true,
-                schema: {
-                  type: "object",
-                  properties: {
-                    items: {
-                      type: "array",
-                      items: {
-                        type: "object",
-                        properties: {
-                          articleName: { type: "string" },
-                          quantity: { type: "number" },
-                          unit: { type: "string" }
-                        },
-                        required: ["articleName", "quantity", "unit"],
-                        additionalProperties: false
-                      }
-                    }
-                  },
-                  required: ["items"],
-                  additionalProperties: false
-                }
-              }
-            }
-          });
 
-          const content = response.choices[0].message.content;
-          if (!content || typeof content !== 'string') {
-            throw new Error("Keine Antwort vom LLM");
-          }
 
-          const parsed = JSON.parse(content);
-          const items = parsed.items || [];
-
-          // Create order items in database
-          const createdItems = [];
-          for (const item of items) {
-            const orderItem = await db.createOrderItem({
-              id: generateId(),
-              voiceOrderId: input.orderId,
-              articleName: item.articleName,
-              quantity: Math.round(item.quantity),
-              unit: item.unit,
-              confirmed: false,
-            });
-            createdItems.push(orderItem);
-          }
-
-          return createdItems;
-        } catch (error) {
-          console.error("Parse error:", error);
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Parsing der Bestellung fehlgeschlagen",
-          });
-        }
-      }),
-
-    // Match order items with article history
-    matchArticles: protectedProcedure
-      .input(z.object({
-        orderId: z.string(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        const items = await db.getOrderItems(input.orderId);
-        const history = await db.getUserArticleHistory(ctx.user.id);
-
-        for (const item of items) {
-          // Simple fuzzy matching - find best match in history
-          let bestMatch = null;
-          let bestScore = 0;
-
-          for (const historyItem of history) {
-            const score = calculateSimilarity(
-              item.articleName.toLowerCase(),
-              historyItem.articleName.toLowerCase()
-            );
-            if (score > bestScore && score > 0.6) {
-              bestScore = score;
-              bestMatch = historyItem;
-            }
-          }
-
-          if (bestMatch) {
-            await db.updateOrderItem(item.id, {
-              matchedArticleId: bestMatch.articleId,
-              matchedArticleName: bestMatch.articleName,
-              matchedSupplier: bestMatch.supplier,
-              matchedPrice: bestMatch.lastPrice,
-              confidence: Math.round(bestScore * 100),
-            });
-          }
-        }
-
-        return db.getOrderItems(input.orderId);
-      }),
-
-    // Get user's voice orders
+    // Get user's orders
     list: protectedProcedure.query(async ({ ctx }) => {
-      return db.getUserVoiceOrders(ctx.user.id);
+      return db.getUserOrders(ctx.user.id);
     }),
 
-    // Get single voice order with items
+    // Get single order
     get: protectedProcedure
       .input(z.object({ id: z.string() }))
       .query(async ({ ctx, input }) => {
-        const order = await db.getVoiceOrder(input.id);
+        const order = await db.getOrder(input.id);
         if (!order || order.userId !== ctx.user.id) {
           throw new TRPCError({ code: "NOT_FOUND" });
         }
-        const items = await db.getOrderItems(input.id);
-        return { order, items };
-      }),
-
-    // Confirm order item
-    confirmItem: protectedProcedure
-      .input(z.object({
-        itemId: z.string(),
-        confirmed: z.boolean(),
-      }))
-      .mutation(async ({ input }) => {
-        await db.updateOrderItem(input.itemId, {
-          confirmed: input.confirmed,
-        });
-        return { success: true };
-      }),
-
-    // Update order item
-    updateItem: protectedProcedure
-      .input(z.object({
-        itemId: z.string(),
-        quantity: z.number().optional(),
-        unit: z.string().optional(),
-        matchedArticleId: z.string().optional(),
-      }))
-      .mutation(async ({ input }) => {
-        const updates: any = {};
-        if (input.quantity !== undefined) updates.quantity = input.quantity;
-        if (input.unit !== undefined) updates.unit = input.unit;
-        if (input.matchedArticleId !== undefined) updates.matchedArticleId = input.matchedArticleId;
-        
-        await db.updateOrderItem(input.itemId, updates);
-        return { success: true };
+        return order;
       }),
   }),
 
@@ -296,28 +138,15 @@ Gib das Ergebnis als JSON-Array zurück mit folgender Struktur:
       }),
   }),
 
-  jbxSettings: router({
-    // Get jb-x settings
-    get: protectedProcedure.query(async ({ ctx }) => {
-      return db.getJbxSettings(ctx.user.id);
+  weeklyOrderSuggestions: router({
+    // Get weekly order suggestions
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const suggestions = await db.getWeeklyOrderSuggestions(ctx.user.id);
+      return suggestions.map(s => ({
+        ...s,
+        items: JSON.parse(s.items as string),
+      }));
     }),
-
-    // Update jb-x settings
-    update: protectedProcedure
-      .input(z.object({
-        jbxUsername: z.string().optional(),
-        jbxPassword: z.string().optional(),
-        jbxOrganization: z.string().optional(),
-        defaultCostCenter: z.string().optional(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        await db.upsertJbxSettings({
-          id: generateId(),
-          userId: ctx.user.id,
-          ...input,
-        });
-        return { success: true };
-      }),
   }),
 });
 

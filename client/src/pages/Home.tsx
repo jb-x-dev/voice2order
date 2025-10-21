@@ -216,6 +216,12 @@ export default function Home() {
                   )}
                 </Button>
               </Link>
+              <Link href="/order-suggestions">
+                <Button variant="outline" size="lg" className="w-full">
+                  <TrendingUp className="h-5 w-5 mr-2" />
+                  Bestellvorschläge
+                </Button>
+              </Link>
             <Link href="/articles">
               <Button variant="outline" size="sm">
                 <Package className="h-4 w-4 mr-2" />
