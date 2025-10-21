@@ -9,6 +9,7 @@ import OrderDetail from "./pages/OrderDetail";
 import Demo from "./pages/Demo";
 import Articles from "./pages/Articles";
 import Catalog from "./pages/Catalog";
+import Suppliers from "./pages/Suppliers";
 import PrintQRCodes from "./pages/PrintQRCodes";
 
 function Router() {
@@ -17,8 +18,9 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path="/demo" component={Demo} />
       <Route path="/catalog" component={Catalog} />
-      <Route path="/print-qr" component={PrintQRCodes} />
+      <Route path="/suppliers" component={Suppliers} />
       <Route path="/articles" component={Articles} />
+      <Route path="/print-qr-codes" component={PrintQRCodes} />
       <Route path={"/order/:id"} component={OrderDetail} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

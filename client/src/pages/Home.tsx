@@ -187,12 +187,18 @@ export default function Home() {
                 🎯 Demo
               </Button>
             </Link>
-            <Link href="/catalog">
-              <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700">
-                <ShoppingCart className="h-4 w-4 mr-2" />
-                Katalog
-              </Button>
-            </Link>
+              <Link href="/catalog">
+                <Button variant="default" size="lg" className="w-full">
+                  <ShoppingCart className="h-5 w-5 mr-2" />
+                  Katalog
+                </Button>
+              </Link>
+              <Link href="/suppliers">
+                <Button variant="default" size="lg" className="w-full">
+                  <Package className="h-5 w-5 mr-2" />
+                  Lieferanten
+                </Button>
+              </Link>
             <Link href="/articles">
               <Button variant="outline" size="sm">
                 <Package className="h-4 w-4 mr-2" />
