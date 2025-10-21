@@ -79,8 +79,8 @@ export const publicSeedRouter = router({
       userId: z.string().optional()
     }))
     .mutation(async ({ input, ctx }) => {
-      // Use provided userId or fallback to authenticated user
-      const targetUserId = input.userId || ctx.user?.id;
+      // Use provided userId, authenticated user, or default to joachim.braun@jb-x.com
+      const targetUserId = input.userId || ctx.user?.id || "joachim.braun@jb-x.com";
       
       if (!targetUserId) {
         throw new Error("User ID required. Please log in first.");
